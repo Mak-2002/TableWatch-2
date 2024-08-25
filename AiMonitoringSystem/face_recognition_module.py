@@ -1,8 +1,11 @@
 import os
 
 import cv2
+import cvzone
 import face_recognition
 import numpy as np
+
+from config import CLASS_COLORS
 
 
 def load_waiter_images(waiter_images_path):
@@ -36,11 +39,9 @@ def encode_waiter_faces(images):
 
 def detect_and_log_faces(img, known_face_encodings, waiter_names, cursor, display_detection_logs):
     """Detect and recognize faces in the image, and log if a known waiter is detected."""
-    small_img = cv2.resize(img, (0, 0), None, 0.25, 0.25)
-    rgb_small_img = cv2.cvtColor(small_img, cv2.COLOR_BGR2RGB)
 
-    face_locations = face_recognition.face_locations(rgb_small_img)
-    face_encodings = face_recognition.face_encodings(rgb_small_img, face_locations)
+    face_locations = face_recognition.face_locations(img)
+    face_encodings = face_recognition.face_encodings(img, face_locations)
 
     for encode_face, face_loc in zip(face_encodings, face_locations):
         matches = face_recognition.compare_faces(known_face_encodings, encode_face)
@@ -53,14 +54,21 @@ def detect_and_log_faces(img, known_face_encodings, waiter_names, cursor, displa
             cursor.execute("SELECT name, email FROM waiters WHERE id = %s", (waiter_id,))
             result = cursor.fetchone()
 
-            name_display = f"{result[0]}\n{result[1]}" if result else "Unknown"
+            waiters_name = f"{result[0]}" if result else "Unknown"
+            y1, x2, y2, x1 = [coord for coord in face_loc]
+
+            if display_detection_logs:
+                print(f"Recognized waiter {waiters_name}")
+
+            waiter_color = CLASS_COLORS.get('waiter', (255, 0, 0))
+            cv2.rectangle(img, (x1, y1), (x2, y2), waiter_color, 1)
+            cvzone.putTextRect(
+                img,
+                f"Waiter {waiters_name}",
+                (max(0, x1), max(35, y1 - 10)),
+                scale=0.8,
+                thickness=1,
+                colorR=waiter_color
+            )
         else:
-            name_display = "Unknown"
-
-        if display_detection_logs:
-            print(name_display)
-        y1, x2, y2, x1 = [coord * 4 for coord in face_loc]
-
-        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)  # Red for faces
-        cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
-        cv2.putText(img, name_display, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+            waiters_name = "Unknown"

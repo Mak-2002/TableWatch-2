@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
@@ -23,10 +25,10 @@ def log_detected_issue(connection: MySQLConnection,
     """Log a detected issue into the database."""
     if table_number is not None:
         query = """
-            INSERT INTO problems (problem_name, problem_description, video_clip_path, table_number)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO problems (problem_name, problem_description, video_clip_path, table_number, created_at)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        values = (issue_name, issue_description, video_clip_path, table_number)
+        values = (issue_name, issue_description, video_clip_path, table_number, datetime.now())
         print(f"Logging issue: {issue_name} at table {table_number}")
         cursor.execute(query, values)
 

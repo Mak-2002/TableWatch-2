@@ -25,42 +25,43 @@ class WaiterController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:waiters,email',
-        'phone' => 'required|string|max:20',
-        'age' => 'required|integer|min:18',
-        'gender' => 'required|boolean',
-        'status' => 'required|boolean',
-        'faceImage' => 'required|string', // Assuming the faceImage is a base64 encoded string
-    ]);
-
-    // Process and save face image
-    if ($request->has('faceImage')) {
-        $faceImageData = $validatedData['faceImage'];
-        $faceImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $faceImageData));
-        $waiterId = Waiter::max('id') + 1; // Get the next ID
-        $faceImageName = $waiterId . '.jpg';
-        $facePath = 'waiterPhoto/' . $faceImageName;
-        Storage::disk('image')->put($facePath, $faceImage);
-
-        $waiter = Waiter::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
-            'age' => $validatedData['age'],
-            'gender' => $validatedData['gender'],
-            'status' => $validatedData['status'],
-            'facePath' => $facePath,
-            'created_By' => Auth::guard('employee')->user()->id,
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:waiters,email',
+            'phone' => 'required|string|max:20',
+            'age' => 'required|integer|min:18',
+            'gender' => 'required|boolean',
+            'status' => 'required|boolean',
+            'faceImage' => 'required|string', // Assuming the faceImage is a base64 encoded string
         ]);
 
-        return redirect()->route('employee.waiter.index')->with('success_message', 'Waiter Created Successfully');
-    }
+        // Process and save face image
+        if ($request->has('faceImage')) {
+            $faceImageData = $validatedData['faceImage'];
+            $faceImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $faceImageData));
+            $waiterId = Waiter::max('id') + 1; // Get the next ID
+            $faceImageName = $waiterId . '.jpg';
+            $facePath = 'waiterPhoto/' . $faceImageName;
+            Storage::disk('image')->put($facePath, $faceImage);
 
-    return back()->withErrors('Image upload failed');
-}
+            $waiter = Waiter::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'age' => $validatedData['age'],
+                'gender' => $validatedData['gender'],
+                'status' => $validatedData['status'],
+                'facePath' => $facePath,
+                'img' => $facePath,
+                'created_By' => Auth::guard('employee')->user()->id,
+            ]);
+
+            return redirect()->route('employee.waiter.index')->with('success_message', 'Waiter Created Successfully');
+        }
+
+        return back()->withErrors('Image upload failed');
+    }
 
 
 
@@ -104,17 +105,17 @@ class WaiterController extends Controller
         return redirect()->route('employee.waiter.archive')->with('success_message', 'Waiter Restored Successfully');
     }
 
-//     public function uploadPhoto(Request $request)
-// {
-//     $request->validate([
-//         'photo' => 'required|image|mimes:jpg,png,jpeg|max:2048',
-//     ]);
+    //     public function uploadPhoto(Request $request)
+    // {
+    //     $request->validate([
+    //         'photo' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+    //     ]);
 
-//     $photo = $request->file('photo');
-//     $photoName = uniqid() . '.' . $photo->getClientOriginalExtension();
-//     $path = $photo->storeAs('waiterPhoto', $photoName, 'public');
+    //     $photo = $request->file('photo');
+    //     $photoName = uniqid() . '.' . $photo->getClientOriginalExtension();
+    //     $path = $photo->storeAs('waiterPhoto', $photoName, 'public');
 
-//     return response()->json(['path' => $path]);
-// }
+    //     return response()->json(['path' => $path]);
+    // }
 
 }

@@ -1,20 +1,17 @@
-import logging
 import math
 
 import cv2
 import cvzone
-from utils import suppress_stdout_stderr
+
 from config import CLASS_COLORS
+from utils import suppress_stdout_stderr
 
 
 def process_video_frame(img, object_detection_model, display_detection_logs, assign_table_identifier,
                         detect_and_log_faces, known_face_encodings, waiter_names, cursor):
     """Process each video frame to detect objects and handle various checks."""
-    if not display_detection_logs:
-        with suppress_stdout_stderr():
-            results = object_detection_model(img)
-    else:
-        results = object_detection_model(img)
+
+    results = object_detection_model(img)
 
     tables, people, waiters, money, food_items, fights = [], [], [], [], [], []
 
@@ -32,9 +29,9 @@ def process_video_frame(img, object_detection_model, display_detection_logs, ass
 
             if class_name in CLASS_COLORS:
                 color = CLASS_COLORS.get(class_name, (255, 255, 255))  # Default to white if color not defined
-                cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+                cv2.rectangle(img, (x1, y1), (x2, y2), color, 1)
                 cvzone.putTextRect(img, f'{class_name} {confidence}', (max(0, x1), max(35, y1 - 10)),
-                                   scale=0.9, thickness=1, colorR=color)
+                                   scale=0.6, thickness=1, colorR=color)
 
                 # Categorize detected objects
                 if class_name == "dining table":

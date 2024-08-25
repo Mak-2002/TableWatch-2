@@ -4,11 +4,12 @@ VIDEO_FILES = [
     "video_cases/second client leave without pay.MOV",
     "video_cases/third client leave.MOV",
     "video_cases/empty restaurant.MOV",
-    "video_cases/Final video with love.MOV",
     "video_cases/last client leave.MOV",
+    "video_cases/unrelated fight scene.mp4",
+    "video_cases/Final video with love.MOV",
 ]
 
-CURRENT_VIDEO_INDEX = 1
+CURRENT_VIDEO_INDEX = 0
 
 # Class colors for bounding boxes
 CLASS_COLORS = {
@@ -24,4 +25,6 @@ CLASS_COLORS = {
 PLAYBACK_SPEED = 2.0
 
 # Waiter images path
-WAITER_IMAGES_PATH = 'C:\\Users\\ameer\\OneDrive\\Desktop\\TableWatch\\Backend\\public\\Image\\waiterPhoto'
+WAITER_IMAGES_PATH = 'C:\\Users\\ameer\\OneDrive\\Desktop\\TableWatch\\Backend\\public\\Image\\waiterPhoto\\'
+
+PROBLEM_CLIPS_PATH = 'C:\\Users\\ameer\\OneDrive\\Desktop\\TableWatch\\Backend\\public\\Video\\problemClip\\'
